@@ -1,0 +1,34 @@
+<?php
+/*********************
+ * index.php
+ *
+ * CSCI S-75
+ * Project 1
+ * Chris Gerber
+ *
+ * Dispatcher for MVC
+ *********************/
+
+echo "Test1";
+session_start();
+
+if (isset($_GET["page"]))
+{
+    $page = $_GET["page"];
+    echo "Test2";
+}	
+else
+{
+    $page = "home";
+    echo "Test3";
+}
+
+$path = __DIR__ . '/controller/' . $page . '.php';
+
+if (file_exists($path))
+{
+    echo "Test4";
+    require($path);
+}
+
+?>

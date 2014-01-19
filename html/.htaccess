@@ -1,0 +1,4 @@
+RewriteEngine on
+RewriteBase /
+RewriteCond %{REQUEST_URI} !index.php
+RewriteRule ^([^/]+)(\/(.+))? project1/html/index.php?page=$1&param=$3 [L]
