@@ -29,15 +29,6 @@ function validateForm()
 	    document.write("Test");
 	}
 
-	/*
-	return 0;
-	if (isValid == false) {
-	    return isValid;
-	} else {
-	    login_user(emailField.val(), passwordField.val());
-	}
-	*/
-
 	return isValid;		
 }
 

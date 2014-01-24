@@ -20,7 +20,6 @@ function render($template, $data = array())
     $path = __DIR__ . '/../view/' . $template . '.php';
 	if (file_exists($path))
     {
-	echo $template;
         extract($data);
         require($path);
     }

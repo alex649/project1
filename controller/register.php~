@@ -19,18 +19,13 @@ if (isset($_POST['email']) &&
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    // $pwdhash = hash("SHA1", $password);
-	
-    // render('pwdhash',array('pwdhash' => $pwdhash));
+    $data = register_user($email, $password, $error);
 
-    $userid = register_user($email, $password, $error);
-    echo $userid;
-    if ($userid > 0)
+    if ($data['userid'] > 0)
     {
-	$_SESSION['userid'] = $userid;
-	render('home');
+	render('home', array('data' => $data));
     }
-    elseif ($userid == 0)
+    elseif ($data['userid'] == 0)
     {
     ?>	
     <script type='text/javascript'>

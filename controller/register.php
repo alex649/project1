@@ -19,14 +19,14 @@ if (isset($_POST['email']) &&
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    $userid = register_user($email, $password, $error);
-    echo $userid;
-    if ($userid > 0)
+    $data = register_user($email, $password, $error);
+
+    if ($data['userid'] > 0)
     {
-	$_SESSION['userid'] = $userid;
-	render('home');
+	$_SESSION['userid'] = $data['userid'];
+	render('home', array('data' => $data));
     }
-    elseif ($userid == 0)
+    elseif ($data['userid'] == 0)
     {
     ?>	
     <script type='text/javascript'>

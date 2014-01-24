@@ -1,8 +1,6 @@
 <?php
 require_once('../includes/helper.php');
 
-$quote_data["symbol"] = $_POST["symbol"];
-
 if (!isset($quote_data["symbol"]))
 {
     // No quote data
@@ -15,18 +13,22 @@ else
     render('header', array('title' => 'Quote for '.htmlspecialchars($quote_data["symbol"])));
 ?>
 
-<table>
-    <tr>
-        <th>Symbol</th>
-        <th>Name</th>
-        <th>Last Trade</th>
-    </tr>
-    <tr>
-        <td><?= htmlspecialchars($quote_data["symbol"]) ?></td>
-        <td><?= htmlspecialchars($quote_data["name"]) ?></td>
-        <td><?= htmlspecialchars($quote_data["last_trade"]) ?></td>
-    </tr>
-</table>
+<form method=POST action=buy>
+    <table>
+        <tr>
+            <th>Symbol</th>
+            <th>Name</th>
+            <th>Last Trade</th>
+	    <th>Shares</th>
+        </tr>
+        <tr>
+            <td><input type=text name="symbol" value="<?= htmlspecialchars($quote_data['symbol']) ?>"></td>
+            <td><input type=text name="last_trade" value="<?= htmlspecialchars($quote_data['last_trade']) ?>"></td>
+	    <td><input type=text name="shares" size=6 maxlength=7></td>
+	    <td><input type=submit name="submit" value="Buy Shares"></td>
+        </tr>
+    </table>
+</form>
 
 <?php
 }

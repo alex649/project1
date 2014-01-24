@@ -15,16 +15,15 @@ require_once('../includes/helper.php');
 if (isset($_POST['email']) &&
 	isset($_POST['password']))
 {
-	
 	$email = $_POST['email'];
 	$password = $_POST['password'];
 	
-	$userid = login_user($email, $password, $error);
+	$data = login_user($email, $password, $error);
 
-	if ($userid > 0)
+	if ($data['userid'] > 0)
 	{
-	    $_SESSION['userid'] = $userid;
-	    render('home');
+	    $_SESSION['userid'] = $data['userid'];
+	    render('home', array('data' => $data));
 	}
 	else
 	{

@@ -18,6 +18,12 @@ define('DB_DATABASE', 'CS75Finance');
 $initial_balance = 100000;
 $pdo = NULL;
 
+/*
+ * connect_to_database() - Connect to database using PDO
+ *
+ * 
+ * @return PDO $pdo object
+ */
 function connect_to_database()
 {
     global $pdo;
@@ -46,7 +52,7 @@ function register_user($email, $password, &$error)
     global $initial_balance;
     global $pdo;
 
-    $userid = 0;
+    $data = array();
 
     try
     {
@@ -67,12 +73,14 @@ function register_user($email, $password, &$error)
     try
     {
 	// add new user into users database
-        $query = sprintf("INSERT INTO `CS75Finance`.`users` (`username`,`password`) VALUES ('$email', '$pwdhash')");
+        $query = sprintf("INSERT INTO `CS75Finance`.`users` (`username`,`password`, `balance`) VALUES ('$email', '$pwdhash',
+            '$initial_balance')");
 	$pdo->query($query);
 
         // check that user has been added to the database
-        // verify email and password pair
-        $query = sprintf("SELECT * FROM users WHERE LOWER(username)='%s' AND password='%s'", strtolower($email), $pwdhash);
+        // verify email and password pair and balance
+        $query = sprintf("SELECT id FROM users WHERE LOWER(username)='%s' AND password='%s' AND balance='%s'",
+            strtolower($email), $pwdhash, $initial_balance);
         $results = $pdo->query($query);
     }
     catch (Exception $e) 
@@ -80,33 +88,31 @@ function register_user($email, $password, &$error)
         $error = 'Your account could not be registered. Did you forget your password?';
     }
 	
-    // print results
-    print "\nUsers\n";
-    print "Id\tUsername\tPassword\n";
+    // get user id
     foreach ($results as $result)
     {
-	$userid = $result['id'];
-    } 
-
-    try
-    {
-        // add $100,000 to the account upon signup
-        $query = sprintf("INSERT INTO `CS75Finance`.`portfolio` (`id`,`balance`) VALUES ('$userid', '$initial_balance')");
-        $pdo->query($query);
-    }
-    catch (Exception $e) 
-    {
-        $error = 'Could not add free gift to your account.';
+	$data['userid'] = $result['id'];
     }
 
-    return $userid;
+    // close database 
+    $pdo = null;
+
+    return $data;
 }
 
+/*
+ * login_user() - Login user
+ *
+ * @param string $email
+ * @param string $password
+ * 
+ * @return string $error
+ */
 function login_user($email, $password, &$error)
 {
     global $pdo;
 
-    $userid = 0;
+    $data = array();
 
     try
     {
@@ -139,6 +145,7 @@ function login_user($email, $password, &$error)
 
     list($salt, $hash) = explode(":", $password_hash);
 
+    // encrypt it
     $pwdhash = crypt($pwdhash, $salt);
 
     // create a password hash to check against the one in the database
@@ -147,61 +154,25 @@ function login_user($email, $password, &$error)
     // check submitted username and password against the ones stored in database
     try
     {
-        $query = sprintf("SELECT * FROM users WHERE LOWER(username)='%s' AND password='%s'", strtolower($email), $pwdhash);
-        $results = $pdo->query($query);
+        $query = sprintf("SELECT id FROM users WHERE LOWER(username)='%s' AND password='%s'", strtolower($email), $pwdhash);
+	$results = $pdo->query($query);
     }
     catch (Exception $e)
     {
         $error = "Unable to query database.  Please check username and password.";
     }
 
-    // print results
-    print "\nUsers\n";
-    print "Id\tUsername\tPassword\n";
+    // get user id
     foreach ($results as $result)
     {
-	print $result['id']."\t";
-	print $result['username']."\t";
-	print $result['password']."\n";
-
-	$userid = $result['id'];
+	$data['userid'] = $result['id'];
     }
 
-    return $userid;
-}
+    // close database 
+    $pdo = null;
 
-/*
- * login_user() - Verify account credentials and create session
- *
- * @param string $email
- * @param string $password
- *
-function login_user($email, $password)
-{
-	// prepare email address and password hash for safe query
-	$email = mysql_escape_string($email);
-	$pwdhash = hash("SHA1",$password);
-	
-	// connect to database with mysql_
-	$connection = mysql_connect(DB_HOST,DB_USER,DB_PASSWORD);
-	mysql_select_db(DB_DATABASE);
-	
-	// verify email and password pair
-	$userid = 0;
-	$query = sprintf("SELECT id FROM users WHERE LOWER(email)='%s' AND passwordhash='%s'",strtolower($email),$pwdhash);
-	$resource = mysql_query($query);
-	if ($resource)
-	{
-	    $row = mysql_fetch_row($resource);
-	    if (isset($row[0]))
-		$userid = $row[0];
-	}
-	
-	// close database and return 
-	mysql_close($connection);
-	return $userid;
+    return $data;
 }
-*/
 
 /*
  * get_user_shares() - Get portfolio for specified userid
@@ -210,27 +181,36 @@ function login_user($email, $password)
  */
 function get_user_shares($userid)
 {
-	// connect to database with PDO
-	$dsn = 'mysql:host='.DB_HOST.';dbname='.DB_DATABASE;
-	$dbh = new PDO($dsn, DB_USER, DB_PASSWORD);
-	
-	// get user's portfolio
-	$stmt = $dbh->prepare("SELECT symbol, shares FROM portfolios WHERE userid=:userid");
-	$stmt->bindValue(':userid', $userid, PDO::PARAM_STR);
-	if ($stmt->execute())
+    global $pdo;
+
+    try
+    {
+        // connect to database
+        $pdo = connect_to_database();
+    }
+    catch (Exception $e)
+    {
+        $error = "Could not connect to database.";
+    }
+
+    // get user's portfolio
+    $stmt = $pdo->prepare("SELECT symbol, shares FROM portfolios WHERE id=:userid");
+    $stmt->bindValue(':userid', $userid, PDO::PARAM_STR);
+    if ($stmt->execute())
+    {
+	$result = array();
+	while ($row = $stmt->fetch())
 	{
-	    $result = array();
-	    while ($row = $stmt->fetch()) {
-	            array_push($result, $row);
-	    }
-	
-	    $dbh = null;
-	    return $result;
+	    array_push($result, $row);
 	}
+
+	$pdo = null;
+	return $result;
+    }
 	
-	// close database and return null 
-	$dbh = null;
-	return null;
+    // close database and return null 
+    $pdo = null;
+    return null;
 }
 
 /*
@@ -252,8 +232,90 @@ function get_quote_data($symbol)
 	return $result;
 }
 
-function get_user_balance($userid) { }
+/*
+ * get_user_balance() - Get user balance
+ *
+ * @param int $userid
+ */
+function get_user_balance($userid) 
+{
+    global $pdo;
+    $balance = 0;
 
-function buy_shares($userid, $symbol, $shares, &$error) { }
+    try
+    {
+        // connect to database
+        $pdo = connect_to_database();
+    }
+    catch (Exception $e)
+    {
+        $error = "Could not connect to database.";
+    }
+
+    try
+    {
+        $query = sprintf("SELECT * FROM users WHERE id='%s'", $userid);
+        $results = $pdo->query($query);
+    }
+    catch (Exception $e)
+    {
+        $error = "Unable to query database.  Please check username and password.";
+    }
+
+    foreach ($results as $result)
+    {
+	$balance = $result['balance'];
+    }
+
+    // close database 
+    // $pdo = null;
+
+    return $balance;
+}
+
+function buy_shares($userid, $symbol, $last_trade, $shares, &$error) 
+{
+    global $pdo;
+
+    $cost_of_shares = $last_trade * $shares;
+
+    try
+    {
+        // connect to database
+        $pdo = connect_to_database();
+    }
+    catch (Exception $e)
+    {
+        $error = "Could not connect to database.";
+    }
+
+    try
+    {
+        // add shares to portofio
+        $query = sprintf("INSERT INTO `CS75Finance`.`portfolios` (`id`, `symbol`, `shares`) VALUES ('$userid', '$symbol', '$shares')");
+        $pdo->query($query);
+    }
+    catch (Exception $e)
+    {
+        $error = "Could not successfully add shares to the portfolios table.";
+    }
+
+    try
+    {
+	// deduct cost from balance in users table
+	$balance = get_user_balance($userid);
+
+	$remaining_balance = $balance - $cost_of_shares;
+
+	$remaining_balance = round($remaining_balance, 2);
+
+	$query = sprintf("UPDATE users SET balance='%s' WHERE id='%s'", $remaining_balance, $userid);
+        $pdo->query($query);
+    }
+    catch (Exception $e)
+    {
+        $error = "Could not successfully update balance in the users database.";
+    }
+}
 
 function sell_shares($userid, $symbol, &$error) { }

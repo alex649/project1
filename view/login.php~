@@ -30,7 +30,6 @@ function validateForm()
 	    isValid = false;
 	    document.write("Test");
 	}
-	break;
 
 	/*
 	return 0;

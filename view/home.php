@@ -4,7 +4,7 @@ render('header', array('title' => 'C$75 Finance'));
 ?>
 
 <ul>
-	<li><a href="quote/GOOG">Get quote for Google</a></li>
+	<li><a href="account_statement">Get Balance</a></li>
 	<li><a href="portfolio">View Portfolio</a></li>
 	<li><a href="logout">Logout</a></li>
 </ul>
@@ -12,7 +12,6 @@ render('header', array('title' => 'C$75 Finance'));
     Quote Symbol:<input type="text" name="symbol">
     <input type="submit" name="submit" value="Search">
 </form>
-
 <?php
 render('footer');
 ?>
