@@ -154,7 +154,7 @@ function login_user($email, $password, &$error)
     // check submitted username and password against the ones stored in database
     try
     {
-        $query = sprintf("SELECT * FROM users WHERE LOWER(username)='%s' AND password='%s'", strtolower($email), $pwdhash);
+        $query = sprintf("SELECT id FROM users WHERE LOWER(username)='%s' AND password='%s'", strtolower($email), $pwdhash);
 	$results = $pdo->query($query);
     }
     catch (Exception $e)
@@ -166,7 +166,6 @@ function login_user($email, $password, &$error)
     foreach ($results as $result)
     {
 	$data['userid'] = $result['id'];
-	$data['balance'] = $result['balance'];
     }
 
     // close database 
@@ -279,6 +278,9 @@ function buy_shares($userid, $symbol, $last_trade, $shares, &$error)
     global $pdo;
 
     $cost_of_shares = $last_trade * $shares;
+    $cost_of_existing_shares;
+    $num_of_existing_shares;
+    $num_of_shares;
 
     try
     {
@@ -292,8 +294,40 @@ function buy_shares($userid, $symbol, $last_trade, $shares, &$error)
 
     try
     {
+	// check if this stock already exists in the portfolio
+        $query = sprintf("SELECT * FROM portfolios WHERE id='%s' AND symbol='%s'", $userid, $symbol);
+        $results = $pdo->query($query);
+
+	foreach ($results as $result)
+        {
+	    $cost_of_existing_shares = $result['cost'];
+	    echo $result['cost'];
+	    $num_of_existing_shares = $result['shares'];
+	    echo $result['shares'];
+        }
+
+	// delete the old entry in the table
+        if (isset($cost_of_existing_shares) && isset($num_of_existing_shares))
+        {
+	    $cost_of_shares = $cost_of_shares + $cost_of_existing_shares;
+	    echo $cost_of_shares;
+	    $num_of_shares = $shares + $num_of_existing_shares;
+	    echo $num_of_shares;
+
+	    $query = sprintf("DELETE FROM portfolios WHERE id='%s' AND symbol='%s' LIMIT 1", $userid, $symbol);
+            $pdo->query($query);
+        }
+    }
+    catch (Exception $e)
+    {
+        $error = "Unable to query database.  Please check username and password.";
+    }
+
+    try
+    {
         // add shares to portofio
-        $query = sprintf("INSERT INTO `CS75Finance`.`portfolios` (`id`, `symbol`, `shares`) VALUES ('$userid', '$symbol', '$shares')");
+        $query = sprintf("INSERT INTO `CS75Finance`.`portfolios` (`id`, `symbol`, `shares`, `cost`) VALUES 
+	    ('$userid', '$symbol', '$num_of_shares', '$cost_of_shares')");
         $pdo->query($query);
     }
     catch (Exception $e)
@@ -319,4 +353,66 @@ function buy_shares($userid, $symbol, $last_trade, $shares, &$error)
     }
 }
 
-function sell_shares($userid, $symbol, &$error) { }
+function sell_shares($userid, $symbol, &$error)
+{
+    global $pdo;
+
+    $cost;
+
+    try
+    {
+        // connect to database
+        $pdo = connect_to_database();
+    }
+    catch (Exception $e)
+    {
+        $error = "Could not connect to database.";
+    }
+
+    try
+    {
+	// get cost of stock when it was bought
+	// in this particular assignment, the stock is sold for the same price as the one at which it was bought
+        $query = sprintf("SELECT * FROM portfolios WHERE id='%s' AND symbol='%s'", $userid, $symbol);
+        $results = $pdo->query($query);
+
+	foreach ($results as $result)
+        {
+	    $cost = $result['cost'];
+        }
+    }
+    catch (Exception $e)
+    {
+        $error = "Unable to query database.  Please check username and password.";
+    }
+
+    try
+    {
+	// if the stock already exists, delete the old entry in the table
+        if (isset($cost))
+        {
+	    $query = sprintf("DELETE FROM portfolios WHERE id='%s' AND symbol='%s' LIMIT 1", $userid, $symbol);
+            $pdo->query($query);
+        }
+    }
+    catch (Exception $e)
+    {
+        $error = "Unable to query database.  Please check username and password.";
+    }  
+
+    try
+    {
+	// add cost of shares sold to the balance in users table
+	$balance = get_user_balance($userid);
+
+	$new_balance = $balance + $cost;
+
+	$query = sprintf("UPDATE users SET balance='%s' WHERE id='%s'", $new_balance, $userid);
+        $pdo->query($query);
+    }
+    catch (Exception $e)
+    {
+        $error = "Could not successfully update balance in the users database.";
+    }
+
+}

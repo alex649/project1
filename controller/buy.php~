@@ -1,12 +1,12 @@
 <?php
 /*********************
- * portfolio.php
+ * buy.php
  *
  * CSCI S-75
  * Project 1
  * Chris Gerber
  *
- * Portfolio controller
+ * Buy shares controller
  *********************/
 
 require_once('../model/model.php');
@@ -21,7 +21,7 @@ if (isset($_SESSION['userid']))
     $shares = $_POST['shares'];
 
     // buy shares
-    buy_shares($userid, $symbol, $last_trade, $shares, &$error);
+    buy_shares($userid, $symbol, &$error);
 
     // get the list of holdings for user
     $holdings = get_user_shares($userid);
