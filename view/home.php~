@@ -4,7 +4,7 @@ render('header', array('title' => 'C$75 Finance'));
 ?>
 
 <ul>
-	<li><a href="balance">Get Balance</a></li>
+	<li><a href="account_statement">Get Balance</a></li>
 	<li><a href="portfolio">View Portfolio</a></li>
 	<li><a href="logout">Logout</a></li>
 </ul>

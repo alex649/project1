@@ -23,7 +23,6 @@ if (isset($_POST['email']) &&
 
     if ($data['userid'] > 0)
     {
-	$_SESSION['userid'] = $data['userid'];
 	render('home', array('data' => $data));
     }
     elseif ($data['userid'] == 0)

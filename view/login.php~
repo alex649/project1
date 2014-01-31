@@ -1,47 +1,69 @@
 <?php
+/*********************
+ * login.php
+ *
+ * CSCI S-75
+ * Project 1
+ * Alex Spivakovsky
+ *
+ * login view
+ *********************/
+
 require_once('../includes/helper.php');
 render('header', array('title' => 'C$75 Finance'));
 ?>
 
 <p>Click here to <a href="register">Register</a></p>
 
-<form method="POST" action="login" onsubmit="return validateForm();">
+<form method="POST" action="home" onsubmit="return validateForm();">
     </br>
-    E-mail address: <input type="text" name="email" />
-    </br>
-    </br>
-    Password: <input type="password" name="password" />
+    E-mail address: <input type="text" name="email" maxlength="30" />
     </br>
     </br>
-    <input type="submit" value="Login" />
+    Password: <input type="password" name="password" size="20" maxlength="20" />
+    </br>
+    </br>
+    <input type="submit" name="login" value="Login" />
 </form>
 
 <script type='text/javascript'>
 // <! [CDATA[
 
+// validates if valid email address and password have been entered
 function validateForm()
 {
-	isValid = true;
-	
-	// check if the email address was entered (min=6: x@x.to)
-	emailField = $("input[name=email]");
-	
-	if (emailField.val().length < 6) {
-	    isValid = false;
-	    document.write("Test");
-	}
+    var isValid = true;
 
-	/*
-	return 0;
-	if (isValid == false) {
-	    return isValid;
-	} else {
-	    login_user(emailField.val(), passwordField.val());
-	}
-	*/
+    // check if the correct email was entered
+    emailField = $("input[name=email]");
+    
+    // email address must be of	the form username@domain.tld or	username@subdomain.domain.tld,
+    // where tld contains only alphabetical characters,	subdomain and domain contain 
+    // only alphanumeric characters, and username contains only alphanumeric characters,
+    // dots, underscores, hyphens, and/or pluses, between 6 and 30 characters
+    var reg = /^\w+([-+_.]\w+)*@\w+([.\w+])\.[a-zA-z]{6,30}$/;
+    if (!reg.test(emailField.val())) {
+	alert("Please enter valid email address.");
+        isValid = false;
+    }
 
-	return isValid;		
+    // check if the correct password was entered
+    passwordField = $("input[name=password]");
+
+    // password must contain at least one number, one lowercase and one uppercase letter,
+    // and be between 6 and 20 characters
+    var re = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]){6,20}/;
+
+    if (!re.test(passwordField.val())) {
+	alert("The password must contain at least one number, "
+            + "one lowercase, one uppercase letter, "
+                + "and must be between 6 and 20 characters long.");
+	isValid = false;
+    }
+
+    return isValid;		
 }
+
 
 // set the focus to the email field (located by id attribute)
 $("input[name=email]").focus();

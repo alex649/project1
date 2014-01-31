@@ -1,4 +1,14 @@
 <?php
+/*********************
+ * home.php
+ *
+ * CSCI S-75
+ * Project 1
+ * Alex Spivakovsky
+ *
+ * home view
+ *********************/
+
 require_once('../includes/helper.php');
 render('header', array('title' => 'C$75 Finance'));
 ?>

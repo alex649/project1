@@ -4,7 +4,7 @@
  *
  * CSCI S-75
  * Project 1
- * Chris Gerber
+ * Alex Spivakovsky
  *
  * Account Statement controller
  *********************/

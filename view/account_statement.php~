@@ -8,7 +8,12 @@ render('header', array('title' => 'Account Statement'));
 <?php
 
 print "Balance:             ";
-print htmlspecialchars($balance['balance']);
+print htmlspecialchars($balance);
 
+?>
+
+Back to <a href="home">Home Page</a>
+
+<?php
 render('footer');
 ?>

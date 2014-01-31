@@ -12,11 +12,15 @@
 require_once('../model/model.php');
 require_once('../includes/helper.php');
 
+$symbol;
+
 if (isset($_SESSION['userid']))
 {
     $userid = (int)$_SESSION['userid'];
 
-    $symbol = $_POST['symbol'];
+    foreach($_POST as $key=>$value) {
+        $symbol = $key;
+    }
 
     // buy shares
     sell_shares($userid, $symbol, &$error);

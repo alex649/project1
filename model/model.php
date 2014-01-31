@@ -4,6 +4,7 @@
  *
  * CSCI S-75
  * Project 1
+ * Alex Spivakovsky
  * Chris Gerber
  *
  * Model for users and portfolios
@@ -277,7 +278,8 @@ function buy_shares($userid, $symbol, $last_trade, $shares, &$error)
 {
     global $pdo;
 
-    $cost_of_shares;
+    $cost = $last_trade * $shares;
+    $cost_this_trade = $cost;
     $cost_of_existing_shares;
     $num_of_existing_shares;
     $num_of_shares;
@@ -301,25 +303,20 @@ function buy_shares($userid, $symbol, $last_trade, $shares, &$error)
 	foreach ($results as $result)
         {
 	    $cost_of_existing_shares = $result['cost'];
-	    echo $result['cost'];
 	    $num_of_existing_shares = $result['shares'];
-	    echo $result['shares'];
         }
 
 	// delete the old entry in the table
-        if (isset($cost_of_existing_shares) && isset($num_of_existing_shares))
+        if (($cost_of_existing_shares > 0) && ($num_of_existing_shares > 0))
         {
-	    $cost_of_shares = $cost_of_shares + $cost_of_existing_shares;
-	    echo $cost_of_shares;
+	    $cost = $cost + $cost_of_existing_shares;
 	    $num_of_shares = $shares + $num_of_existing_shares;
-	    echo $num_of_shares;
 
 	    $query = sprintf("DELETE FROM portfolios WHERE id='%s' AND symbol='%s' LIMIT 1", $userid, $symbol);
             $pdo->query($query);
         }
 	else
 	{
-	    $cost_of_shares = $last_trade * $shares;
 	    $num_of_shares = $shares;
 	}
     }
@@ -332,7 +329,7 @@ function buy_shares($userid, $symbol, $last_trade, $shares, &$error)
     {
         // add shares to portofio
         $query = sprintf("INSERT INTO `CS75Finance`.`portfolios` (`id`, `symbol`, `shares`, `cost`) VALUES 
-	    ('$userid', '$symbol', '$num_of_shares', '$cost_of_shares')");
+	    ('$userid', '$symbol', '$num_of_shares', '$cost')");
         $pdo->query($query);
     }
     catch (Exception $e)
@@ -345,7 +342,8 @@ function buy_shares($userid, $symbol, $last_trade, $shares, &$error)
 	// deduct cost from balance in users table
 	$balance = get_user_balance($userid);
 
-	$remaining_balance = $balance - $cost_of_shares;
+	echo $cost;
+	$remaining_balance = $balance - $cost_this_trade;
 
 	$remaining_balance = round($remaining_balance, 2);
 

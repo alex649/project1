@@ -1,4 +1,14 @@
 <?php
+/*********************
+ * quote.php
+ *
+ * CSCI S-75
+ * Project 1
+ * Alex Spivakovsky
+ *
+ * quote view
+ *********************/
+
 require_once('../includes/helper.php');
 
 if (!isset($quote_data["symbol"]))
@@ -13,7 +23,7 @@ else
     render('header', array('title' => 'Quote for '.htmlspecialchars($quote_data["symbol"])));
 ?>
 
-<form method=POST action=buy>
+<form method=POST action=portfolio>
     <table>
         <tr>
             <th>Symbol</th>
@@ -30,6 +40,9 @@ else
         </tr>
     </table>
 </form>
+<br>
+<br>
+<p>Back to <a href="home">Home Page</a></p>
 
 <?php
 }
