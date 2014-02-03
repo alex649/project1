@@ -1,4 +1,27 @@
-This is the Walkthrough for Project 1.
+Project 1
 
-Chris Gerber
-TF, S-75
+Written by Alex Spivakovsky and Chris Gerber, TA in CSCI-75.
+
+The application registers a user for an account.  Upon registration, the new user is given $100,000.
+If a username already exists, the user can login into the account.
+The website does appropriate username (in this case email address) and password validation
+as documented in the comments in project1/view/register.php and project1/views/login.php.
+
+In the homepage, the user has the option of viewing the balance, viewing one's portfolio, logging out,
+or searching for a stock by providing a symbol.  Upon submitting a symbol, the code pulls the stock
+information that includes the price and the name of the stock from the Yahoo Finance website and displays it.
+At this point, the user has the option of buying the stock by specifying the quantity of the stock.
+Upon purchase, the portfolio is displayed.  On this screen, the user has the option of selling the stock.
+In this application, the user can only sell all of the shares of a particular stock.
+
+This application complies with the Model-View-Controller architecture.  Content of the files
+in the project1/controller/ folder directs the user to the appropriate pages, which are displayed by
+project1/view/ code.  The project1/model/model.php contains methods for connecting to the database,
+getting quote data from Yahoo Finance, buying and selling stocks, and displaying the portfolio from the database.
+
+The database used in this application is MySQL.  It contains two tables, `users` and `portfolios`.
+The users tables contains columns for (user) id, email address (username), password, and (user account) balance.
+The portfolios table contains columns (user) id, (stock) symbol, (number of) shares, and cost
+(of the shares of this particular stock).
+
+

@@ -39,7 +39,7 @@ function validateForm()
     // where tld contains only alphabetical characters,	subdomain and domain contain 
     // only alphanumeric characters, and username contains only alphanumeric characters,
     // dots, underscores, hyphens, and/or pluses, between 6 and 30 characters
-    var reg = /^\w+([-+_.]\w+)*@(\w+([.\w+]))|\w+\.[a-zA-z].{6,30}$/;
+    var reg = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     if (!reg.test(emailField.val())) {
 	alert("Please enter valid email address.");
         isValid = false;
