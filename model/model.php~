@@ -4,6 +4,7 @@
  *
  * CSCI S-75
  * Project 1
+ * Alex Spivakovsky
  * Chris Gerber
  *
  * Model for users and portfolios
@@ -62,6 +63,7 @@ function register_user($email, $password, &$error)
     catch (Exception $e)
     {
         $error = "Could not connect to database.";
+	return;
     }
 
     // prepare password hash
@@ -86,6 +88,7 @@ function register_user($email, $password, &$error)
     catch (Exception $e) 
     {
         $error = 'Your account could not be registered. Did you forget your password?';
+	return;
     }
 	
     // get user id
@@ -122,6 +125,7 @@ function login_user($email, $password, &$error)
     catch (Exception $e)
     {
         $error = "Could not connect to database.";
+	return;
     }
 
     // prepare password hash
@@ -136,6 +140,7 @@ function login_user($email, $password, &$error)
     catch (Exception $e)
     {
         $error = "Unable to query database.  Please check username and password.";
+	return;
     }
 
     foreach ($results as $result)
@@ -160,6 +165,7 @@ function login_user($email, $password, &$error)
     catch (Exception $e)
     {
         $error = "Unable to query database.  Please check username and password.";
+	return;
     }
 
     // get user id
@@ -191,6 +197,7 @@ function get_user_shares($userid)
     catch (Exception $e)
     {
         $error = "Could not connect to database.";
+	return;
     }
 
     // get user's portfolio
@@ -250,6 +257,7 @@ function get_user_balance($userid)
     catch (Exception $e)
     {
         $error = "Could not connect to database.";
+	return;
     }
 
     try
@@ -260,6 +268,7 @@ function get_user_balance($userid)
     catch (Exception $e)
     {
         $error = "Unable to query database.  Please check username and password.";
+	return;
     }
 
     foreach ($results as $result)
@@ -277,11 +286,19 @@ function buy_shares($userid, $symbol, $last_trade, $shares, &$error)
 {
     global $pdo;
 
+    $balance = get_user_balance($userid);
     $cost = $last_trade * $shares;
     $cost_this_trade = $cost;
     $cost_of_existing_shares;
     $num_of_existing_shares;
     $num_of_shares;
+
+    // check that the remaining balance on the account allows for the purchase to happen
+    if ($balance < $cost)
+    {
+	$error = "You do not have enough money on your account to make this purchase.";
+	return;
+    }
 
     try
     {
@@ -291,8 +308,9 @@ function buy_shares($userid, $symbol, $last_trade, $shares, &$error)
     catch (Exception $e)
     {
         $error = "Could not connect to database.";
+	return;
     }
-
+        
     try
     {
 	// check if this stock already exists in the portfolio
@@ -311,29 +329,24 @@ function buy_shares($userid, $symbol, $last_trade, $shares, &$error)
 	    $cost = $cost + $cost_of_existing_shares;
 	    $num_of_shares = $shares + $num_of_existing_shares;
 
-	    $query = sprintf("DELETE FROM portfolios WHERE id='%s' AND symbol='%s' LIMIT 1", $userid, $symbol);
+	    $query = sprintf("UPDATE `CS75Finance`.`portfolios` SET 
+		`id`='$userid', `symbol`='$symbol', `shares`='$num_of_shares', `cost`='$cost' WHERE id='$userid'");
             $pdo->query($query);
         }
 	else
 	{
 	    $num_of_shares = $shares;
+
+	    // add shares to portofio
+            $query = sprintf("INSERT INTO `CS75Finance`.`portfolios` (`id`, `symbol`, `shares`, `cost`) VALUES 
+	        ('$userid', '$symbol', '$num_of_shares', '$cost')");
+            $pdo->query($query);
 	}
     }
     catch (Exception $e)
     {
-        $error = "Unable to query database.  Please check username and password.";
-    }
-
-    try
-    {
-        // add shares to portofio
-        $query = sprintf("INSERT INTO `CS75Finance`.`portfolios` (`id`, `symbol`, `shares`, `cost`) VALUES 
-	    ('$userid', '$symbol', '$num_of_shares', '$cost')");
-        $pdo->query($query);
-    }
-    catch (Exception $e)
-    {
         $error = "Could not successfully add shares to the portfolios table.";
+	return;
     }
 
     try
@@ -341,7 +354,6 @@ function buy_shares($userid, $symbol, $last_trade, $shares, &$error)
 	// deduct cost from balance in users table
 	$balance = get_user_balance($userid);
 
-	echo $cost;
 	$remaining_balance = $balance - $cost_this_trade;
 
 	$remaining_balance = round($remaining_balance, 2);
@@ -352,6 +364,7 @@ function buy_shares($userid, $symbol, $last_trade, $shares, &$error)
     catch (Exception $e)
     {
         $error = "Could not successfully update balance in the users database.";
+	return;
     }
 }
 
@@ -369,6 +382,7 @@ function sell_shares($userid, $symbol, &$error)
     catch (Exception $e)
     {
         $error = "Could not connect to database.";
+	return;
     }
 
     try
@@ -386,6 +400,7 @@ function sell_shares($userid, $symbol, &$error)
     catch (Exception $e)
     {
         $error = "Unable to query database.  Please check username and password.";
+	return;
     }
 
     try
@@ -400,6 +415,7 @@ function sell_shares($userid, $symbol, &$error)
     catch (Exception $e)
     {
         $error = "Unable to query database.  Please check username and password.";
+	return;
     }  
 
     try
@@ -415,6 +431,6 @@ function sell_shares($userid, $symbol, &$error)
     catch (Exception $e)
     {
         $error = "Could not successfully update balance in the users database.";
+	return;
     }
-
 }

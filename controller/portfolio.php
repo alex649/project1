@@ -25,6 +25,11 @@ if (isset($_SESSION['userid']))
     if (isset($last_trade))
     {
         buy_shares($userid, $symbol, $last_trade, $shares, &$error);
+	
+	if (isset($error))
+	{
+	    print $error;
+	}
     }
 
     $i = 0;
@@ -38,6 +43,11 @@ if (isset($_SESSION['userid']))
     {	
         // sell shares
         sell_shares($userid, $symbol, &$error);
+
+	if (isset($error))
+	{
+	    print $error;
+	}
     }
 
     $holdings = get_user_shares($userid);

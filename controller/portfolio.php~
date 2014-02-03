@@ -4,7 +4,7 @@
  *
  * CSCI S-75
  * Project 1
- * Chris Gerber
+ * Alex Spivakovsky
  *
  * Portfolio controller
  *********************/
@@ -25,6 +25,11 @@ if (isset($_SESSION['userid']))
     if (isset($last_trade))
     {
         buy_shares($userid, $symbol, $last_trade, $shares, &$error);
+	
+	if (isset($error))
+	{
+	    print $error;
+	}
     }
 
     $i = 0;

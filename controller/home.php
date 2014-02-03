@@ -17,10 +17,15 @@ if (isset($_POST['register']))
     if (isset($_POST['email']) &&
 	isset($_POST['password']))
     {
-        $email = $_POST['email'];
-        $password = $_POST['password'];
+        $email = htmlspecialchars($_POST['email']);
+        $password = htmlspecialchars($_POST['password']);
 
-        $data = register_user($email, $password, $error);
+        $data = register_user($email, $password, &$error);
+
+	if (isset($error))
+	{
+	    print $error;
+	}
 
         if ($data['userid'] > 0)
         {
@@ -54,10 +59,15 @@ elseif (isset($_POST['login']))
     if (isset($_POST['email']) &&
 	isset($_POST['password']))
     {
-	$email = $_POST['email'];
-	$password = $_POST['password'];
+	$email = htmlspecialchars($_POST['email']);
+	$password = htmlspecialchars($_POST['password']);
 	
-	$data = login_user($email, $password, $error);
+	$data = login_user($email, $password, &$error);
+
+	if (isset($error))
+	{
+	    print $error;
+	}
 
 	if ($data['userid'] > 0)
 	{

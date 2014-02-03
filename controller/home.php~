@@ -4,7 +4,7 @@
  *
  * CSCI S-75
  * Project 1
- * Chris Gerber
+ * Alex Spivakovsky
  *
  * Default controller
  *********************/
@@ -17,8 +17,8 @@ if (isset($_POST['register']))
     if (isset($_POST['email']) &&
 	isset($_POST['password']))
     {
-        $email = $_POST['email'];
-        $password = $_POST['password'];
+        $email = htmlspecialchars($_POST['email']);
+        $password = htmlspecialchars($_POST['password']);
 
         $data = register_user($email, $password, $error);
 
@@ -54,8 +54,8 @@ elseif (isset($_POST['login']))
     if (isset($_POST['email']) &&
 	isset($_POST['password']))
     {
-	$email = $_POST['email'];
-	$password = $_POST['password'];
+	$email = htmlspecialchars($_POST['email']);
+	$password = htmlspecialchars($_POST['password']);
 	
 	$data = login_user($email, $password, $error);
 

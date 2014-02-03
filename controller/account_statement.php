@@ -16,7 +16,12 @@ if (isset($_SESSION['userid']))
 {
 	// get the list of holdings for user
 	$userid = (int)$_SESSION['userid'];
-	$balance = get_user_balance($userid);
+	$balance = get_user_balance($userid, &$error);
+
+	if (isset($error))
+	{
+	    print $error;
+	}
 	
 	render('account_statement', array('balance' => $balance));
 }
