@@ -51,6 +51,8 @@ if (isset($_SESSION['userid']))
 	render('home');
 
 	print $error;
+
+	return;
     }
 	
     render('portfolio', array('holdings' => $holdings));

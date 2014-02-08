@@ -38,9 +38,10 @@ if (isset($_SESSION['userid']))
 	$i++;
     }
 
+    // shares are sold if only one $_POST variable (symbol)
+    // has been submitted from the previous page
     if (isset($symbol) && ($i < 2))
     {	
-        // sell shares
         sell_shares($userid, $symbol, &$error);
     }
 
