@@ -32,9 +32,9 @@ else
 	    <th>Shares</th>
         </tr>
         <tr>
-            <td><input type=text name="symbol" value="<?= htmlspecialchars($quote_data['symbol']) ?>"></td>
-	    <td><input type=text name="name" value="<?= htmlspecialchars($quote_data['name']) ?>"></td>
-            <td><input type=text name="last_trade" value="<?= htmlspecialchars($quote_data['last_trade']) ?>"></td>
+            <td><input type=text name="symbol" value="<?= htmlspecialchars($quote_data['symbol']) ?>" readonly></td>
+	    <td><input type=text name="name" value="<?= htmlspecialchars($quote_data['name']) ?>" readonly></td>
+            <td><input type=text name="last_trade" value="<?= htmlspecialchars($quote_data['last_trade']) ?>" readonly></td>
 	    <td><input type=text name="shares" size=6 maxlength=7></td>
 	    <td><input type=submit name="submit" value="Buy Shares"></td>
         </tr>
