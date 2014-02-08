@@ -282,6 +282,16 @@ function get_user_balance($userid)
     return $balance;
 }
 
+/*
+ * buy_shares() - Buy shares by adding them to portfolios table
+ *                and updating the balance in the users table  
+ * @param int $userid
+ * @param string $symbol
+ * @param decimal $last_trade
+ * @param int $shares
+ * 
+ * @return string $error
+ */
 function buy_shares($userid, $symbol, $last_trade, $shares, &$error) 
 {
     global $pdo;
@@ -354,65 +364,17 @@ function buy_shares($userid, $symbol, $last_trade, $shares, &$error)
         $error = "Could not buy the shares.";
 	return;
     }
-    /*     
-    try
-    {
-	// check if this stock already exists in the portfolio
-        $query = sprintf("SELECT * FROM portfolios WHERE id='%s' AND symbol='%s'", $userid, $symbol);
-        $results = $pdo->query($query);
-
-	foreach ($results as $result)
-        {
-	    $cost_of_existing_shares = $result['cost'];
-	    $num_of_existing_shares = $result['shares'];
-        }
-
-	// delete the old entry in the table
-        if (($cost_of_existing_shares > 0) && ($num_of_existing_shares > 0))
-        {
-	    $cost = $cost + $cost_of_existing_shares;
-	    $num_of_shares = $shares + $num_of_existing_shares;
-
-	    $query = sprintf("UPDATE portfolios SET 
-		`id`='$userid', `symbol`='$symbol', `shares`='$num_of_shares', `cost`='$cost' WHERE id='$userid' AND symbol='$symbol'");
-            $pdo->query($query);
-        }
-	else
-	{
-	    $num_of_shares = $shares;
-
-	    // add shares to portofio
-            $query = sprintf("INSERT INTO `CS75Finance`.`portfolios` (`id`, `symbol`, `shares`, `cost`) VALUES 
-	        ('$userid', '$symbol', '$num_of_shares', '$cost')");
-            $pdo->query($query);
-	}
-    }
-    catch (Exception $e)
-    {
-        $error = "Could not successfully add shares to the portfolios table.";
-	return;
-    }
-
-    try
-    {
-	// deduct cost from balance in users table
-	$balance = get_user_balance($userid);
-
-	$remaining_balance = $balance - $cost_this_trade;
-
-	$remaining_balance = round($remaining_balance, 2);
-
-	$query = sprintf("UPDATE users SET balance='%s' WHERE id='%s'", $remaining_balance, $userid);
-        $pdo->query($query);
-    }
-    catch (Exception $e)
-    {
-        $error = "Could not successfully update balance in the users database.";
-	return;
-    }
-    */
 }
 
+/*
+ * sell_shares() - Sell shares, deleting them from portfolios table
+ *                 and updating the balance in the users table
+ *
+ * @param int $userid
+ * @param string $symbol
+ * 
+ * @return string $error
+ */
 function sell_shares($userid, $symbol, &$error)
 {
     global $pdo;
@@ -430,30 +392,8 @@ function sell_shares($userid, $symbol, &$error)
 	return;
     }
 
-    /*
     try
     {
-	// get cost of stock when it was bought
-	// in this particular assignment, the stock is sold for the same price as the one at which it was bought
-        $query = sprintf("SELECT * FROM portfolios WHERE id='%s' AND symbol='%s'", $userid, $symbol);
-        $results = $pdo->query($query);
-
-	foreach ($results as $result)
-        {
-	    $cost = $result['cost'];
-        }
-    }
-    catch (Exception $e)
-    {
-        $error = "Unable to query database.  Please check username and password.";
-	return;
-    }
-    */
-
-    try
-    {
-
-	
 	// get cost of stock when it was bought
 	// in this particular assignment, the stock is sold for the same price as the one at which it was bought
 	$query = sprintf("START TRANSACTION;");

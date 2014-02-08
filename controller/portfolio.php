@@ -19,21 +19,12 @@ if (isset($_SESSION['userid']))
 
     // variables for buying shares
     $symbol = $_POST['symbol'];
-    $last_trade = $_POST['last_trade'];
-    $shares = $_POST['shares'];
 
-    if (!is_int($shares))
-    {
-	?>	
-	    <script type='text/javascript'>
-	        alert("Only whole numbers of shares are allowed.");
-	    </script>
-	<?
+    // only whole integers are allowed for the number of shares
+    $shares = intval($_POST['shares']);
 
-	render('home');
-
-	return;
-    }
+    $result = get_quote_data($symbol);
+    $last_trade = $result['last_trade'];
 
     if (isset($last_trade))
     {
@@ -42,6 +33,8 @@ if (isset($_SESSION['userid']))
 	if (isset($error))
 	{
 	    print $error;
+
+	    return;
 	}
     }
 
@@ -60,6 +53,8 @@ if (isset($_SESSION['userid']))
 	if (isset($error))
 	{
 	    print $error;
+
+	    return;
 	}
     }
 
@@ -68,6 +63,8 @@ if (isset($_SESSION['userid']))
     if (isset($error))
     {
 	print $error;
+
+	return;
     }
 	
     render('portfolio', array('holdings' => $holdings));

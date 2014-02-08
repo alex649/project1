@@ -298,12 +298,6 @@ function buy_shares($userid, $symbol, $last_trade, $shares, &$error)
 
     $balance = get_user_balance($userid);
     $cost = $last_trade * $shares;
-    $cost_this_trade = $cost;
-    $cost_of_existing_shares;
-    $num_of_existing_shares;
-    $num_of_shares;
-
-    $balance = get_user_balance($userid);
 
     $remaining_balance = $balance - $cost_this_trade;
 
