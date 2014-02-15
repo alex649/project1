@@ -13,17 +13,18 @@ session_start();
 if (isset($_GET["page"]))
 {
     $page = $_GET["page"];
+    echo $page;
 }
 else
 {
     $page = "home";
+    echo $page;
 }
 
 $path = __DIR__ . '/../controller/' . $page . '.php';
 
 if (file_exists($path))
 {
-    echo $path;
     require($path);
 }
 

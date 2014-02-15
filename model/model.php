@@ -29,13 +29,9 @@ function connect_to_database()
 {
     global $pdo;
 
-    $dsn = "mysql:host=localhost;dbname=CS75Finance;charset=utf8";
-    $opt = array(
-        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-    );
-
-    $pdo = new PDO($dsn, DB_USER, DB_PASSWORD, $opt);
+    // connect to server and select database
+    $dsn = 'mysql:host='.DB_HOST.';dbname='.DB_DATABASE;
+    $pdo = new PDO($dsn, DB_USER, DB_PASSWORD);
 
     return $pdo;
 }
